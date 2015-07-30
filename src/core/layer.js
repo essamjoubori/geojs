@@ -27,7 +27,6 @@ geo.layer = function (arg) {
                                            "bin": 100} : arg.style,
       m_id = arg.id === undefined ? geo.layer.newLayerId() : arg.id,
       m_name = "",
-      m_gcs = "EPSG:4326",
       m_timeRange = null,
       m_source = arg.source || null,
       m_map = arg.map === undefined ? null : arg.map,
@@ -157,30 +156,6 @@ geo.layer = function (arg) {
     }
     m_style.bin = val;
     m_this.modified();
-    return m_this;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Get/Set projection of the layer
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.gcs = function (val) {
-    if (val === undefined) {
-      return m_gcs;
-    }
-    m_gcs = val;
-    m_this.modified();
-    return m_this;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Transform layer to the reference layer gcs
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.transform = function (val) {
-    geo.transform.transformLayer(val, m_this, m_map.baseLayer());
     return m_this;
   };
 
@@ -319,8 +294,11 @@ geo.layer = function (arg) {
 
   ////////////////////////////////////////////////////////////////////////////
   /**
-   * Transform a point or array of points in GCS space to
-   * local space of the layer
+   * Transform coordinates from GCS coordinates into a local coordinate
+   * system specific to the underlying renderer.  This method is exposed
+   * to allow direct access the rendering context, but otherwise should
+   * not be called directly.  The default implementation is the identity
+   * operator.
    */
   ////////////////////////////////////////////////////////////////////////////
   this.toLocal = function (input) {
@@ -329,8 +307,7 @@ geo.layer = function (arg) {
 
   ////////////////////////////////////////////////////////////////////////////
   /**
-   * Transform a point or array of points in local space to
-   * latitude-longitude space
+   * Transform coordinates from a local coordinate system to GCS coordinates.
    */
   ////////////////////////////////////////////////////////////////////////////
   this.fromLocal = function (input) {
