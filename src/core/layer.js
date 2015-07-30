@@ -21,14 +21,9 @@ geo.layer = function (arg) {
   //////////////////////////////////////////////////////////////////////////////
   var m_this = this,
       s_exit = this._exit,
-      m_style = arg.style === undefined ? {"opacity": 0.5,
-                                           "color": [0.8, 0.8, 0.8],
-                                           "visible": true,
-                                           "bin": 100} : arg.style,
+      m_style = arg.style === undefined ? {"visible": true} : arg.style,
       m_id = arg.id === undefined ? geo.layer.newLayerId() : arg.id,
       m_name = "",
-      m_timeRange = null,
-      m_source = arg.source || null,
       m_map = arg.map === undefined ? null : arg.map,
       m_isReference = false,
       m_x = 0,
@@ -40,9 +35,6 @@ geo.layer = function (arg) {
       m_renderer = null,
       m_initialized = false,
       m_rendererName = arg.renderer === undefined ? "vgl" : arg.renderer,
-      m_dataTime = geo.timestamp(),
-      m_updateTime = geo.timestamp(),
-      m_drawTime = geo.timestamp(),
       m_sticky = arg.sticky === undefined ? true : arg.sticky,
       m_active = arg.active === undefined ? true : arg.active;
 
@@ -115,22 +107,6 @@ geo.layer = function (arg) {
 
   ////////////////////////////////////////////////////////////////////////////
   /**
-   * Get/Set opacity of the layer
-   *
-   * @returns {Number}
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.opacity = function (val) {
-    if (val === undefined) {
-      return m_style.opacity;
-    }
-    m_style.opacity = val;
-    m_this.modified();
-    return m_this;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
    * Get/Set visibility of the layer
    */
   ////////////////////////////////////////////////////////////////////////////
@@ -139,50 +115,6 @@ geo.layer = function (arg) {
       return m_style.visible;
     }
     m_style.visible = val;
-    m_this.modified();
-    return m_this;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Get/Set bin of the layer
-   *
-   * @returns {Number}
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.bin = function (val) {
-    if (val === undefined) {
-      return m_style.bin;
-    }
-    m_style.bin = val;
-    m_this.modified();
-    return m_this;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Get/Set time range of the layer
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.timeRange = function (val) {
-    if (val === undefined) {
-      return m_timeRange;
-    }
-    m_timeRange = val;
-    m_this.modified();
-    return m_this;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Get/Set source of the layer
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.source = function (val) {
-    if (val === undefined) {
-      return m_source;
-    }
-    m_source = val;
     m_this.modified();
     return m_this;
   };
@@ -232,41 +164,6 @@ geo.layer = function (arg) {
 
   ////////////////////////////////////////////////////////////////////////////
   /**
-   * Return last time data got changed
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.dataTime = function () {
-    return m_dataTime;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Return the modified time for the last update that did something
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.updateTime = function () {
-    return m_updateTime;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Return the modified time for the last draw call that did something
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.drawTime = function () {
-    return m_drawTime;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Run query and return results for it
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.query = function () {
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
    * Get/Set layer as the reference layer
    */
   ////////////////////////////////////////////////////////////////////////////
@@ -277,19 +174,6 @@ geo.layer = function (arg) {
       return m_this;
     }
     return m_isReference;
-  };
-
-  ////////////////////////////////////////////////////////////////////////////
-  /**
-   * Get/Set if the layer has been initialized
-   */
-  ////////////////////////////////////////////////////////////////////////////
-  this.initialized = function (val) {
-    if (val !== undefined) {
-      m_initialized = val;
-      return m_this;
-    }
-    return m_initialized;
   };
 
   ////////////////////////////////////////////////////////////////////////////
