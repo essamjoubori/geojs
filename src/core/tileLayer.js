@@ -48,6 +48,8 @@
       return new geo.tileLayer(options);
     }
     geo.featureLayer.call(this, options);
+    $.extend(this, pr);
+
     options = $.extend(options || {}, geo.tileLayer.defaults);
 
     // copy the options into a private variable
@@ -61,7 +63,7 @@
     return this;
   };
 
-  geo.tileLayer.prototype = {
+  var pr = {
     /**
      * Readonly accessor to the options object
      */
@@ -409,6 +411,25 @@
     reset: function () {
       this.clear();
       this._cache.clear();
+    },
+
+    /**
+     * Update the view according to the map/camera.
+     * @returns {this} Chainable
+     */
+    _update: function () {
+      var zoom = Math.floor(this.map().zoom()),
+          center = this.toLocal(this.map().center()),
+          size = this.map().size(),
+          tiles;
+
+      tiles = this._getTiles(zoom, center, size, true);
+
+      tiles.forEach(function (tile) {
+        tile.then(function () {
+          this.draw(tile);
+        }.bind(this));
+      }.bind(this));
     }
   };
 
