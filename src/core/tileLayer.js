@@ -309,8 +309,7 @@
     },
 
     /**
-     * Draw the given tile on the active canvas.  Can be overridden in derived classes
-     * to draw the tile within a renderer's context.
+     * Draw the given tile on the active canvas.
      * @param {geo.tile} tile The tile to draw
      */
     draw: function (tile) {
@@ -321,20 +320,69 @@
         this.remove(tile);
       }
 
+      // pass to the rendering implementation
+      this._draw(tile);
+
       // add the tile to the active cache
       this._active[tile.toString()] = tile;
     },
 
     /**
-     * Remove the given tile from the canvas.
+     * Render the tile on the canvas.  This implementation draws the tiles directly
+     * on the DOM using <img> tags.  Derived classes should override this method
+     * to draw the tile on a renderer specific context.
+     * @protected
+     * @param {geo.tile} tile The tile to draw
+     */
+    _draw: function (tile) {
+      // Make sure this method is not called when there is
+      // a renderer attached.
+      if (this.renderer() !== null) {
+        throw new Error('This draw method is not valid on renderer managed layers.');
+      }
+
+      // get the layer node
+      var div = this.canvas();
+
+      // append the image element
+      div.append(tile.image);
+
+      // apply a transform to place the image correctly
+      tile.image.css.transform = 'translate(' +
+        [tile.bottomLeft().x, tile.topRight().y] + ')';
+
+      // add an error handler
+      tile.catch(function () {
+        var err = $(geo.tileLayer.errorTile);
+        err.appendTo(this.image.parentNode);
+        tile.image.remove();
+      });
+    },
+
+    /**
+     * Remove the given tile from the canvas and the active cache.
      * @param {geo.tile|string} tile The tile (or hash) to remove
      * @returns {geo.tile} the tile removed from the active layer
      */
     remove: function (tile) {
       tile = tile.toString();
       var value = this._active[tile];
+
+      if (value instanceof geo.tile) {
+        this._remove(value);
+      }
+
       delete this._active[tile];
       return value;
+    },
+
+    /**
+     * Remove the given tile from the canvas.  This implementation just
+     * finds and removes the <img> element created for the tile.
+     * @param {geo.tile|string} tile The tile object to remove
+     */
+    _remove: function (tile) {
+      tile.image.remove();
     },
 
     /**
@@ -380,8 +428,23 @@
     maxX: 255,
     minY: 0,
     maxY: 255,
-    cacheSize: 200
+    cacheSize: 200,
+    attribution: 'No data attribution provided.'
   };
+
+  // This is html content displayed when there is an error loading a tile
+  geo.featureLayer.errorTile = [
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 255 255"',
+    ' width="256px" height="256px">',
+    '<rect style="stroke:black;stroke-width:1;fill:none" x="1" y="1"',
+    ' width="252" height="252"/>',
+    '<g style="fill-opacity:0.5;stroke-linecap:round">',
+    '<rect style="stroke:grey;stroke-width:3px;fill:#ffffff;" height="200"',
+    ' width="200" y="25" x="25"/>',
+    '<line x1="76" x2="178" y1="76" y2="178" style="stroke:#ff0000;stroke-width:5px"/>',
+    '<line x2="76" x1="178" y1="76" y2="178" style="stroke:#ff0000;stroke-width:5px"/>',
+    '</g></svg>'
+  ].join('');
 
   inherit(geo.tileLayer, geo.featureLayer);
 })();

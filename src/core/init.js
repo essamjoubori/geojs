@@ -15,7 +15,7 @@ geo.inherit = function (C, P) { // jshint ignore: line
   'use strict';
 
   var F = inherit.func();
-  F.prototype = P.prototype;
+  $.extend(F.prototype, C.prototype, P.prototype);
   C.prototype = new F();
   C.prototype.constructor = C;
 };
